@@ -1,0 +1,83 @@
+Podman CLI commands with short, clear descriptions — perfect for beginners or Docker users transitioning to Podman.
+
+Podman CLI Commands – Quick Reference
+Command	Description
+podman version	Show the Podman version installed
+podman info	Display system info: storage, runtime, rootless mode, registries
+podman help	List all top-level commands and options
+podman help <command>	Show help for a specific command
+
+Image Commands
+Command	Description
+podman pull <image>	Download image from a registry (e.g., Docker Hub)
+podman images	List all local container images
+podman rmi <image>	Remove image(s) from local storage
+podman tag <src> <target>	Tag an image with a new name
+podman build -t <name> .	Build an image from a Dockerfile
+podman inspect <image>	Show detailed metadata of an image
+
+Container Commands
+Command	Description
+podman run <image>	Run a new container from an image
+podman start <container>	Start a previously created/stopped container
+podman stop <container>	Gracefully stop a running container
+podman restart <container>	Restart a container
+podman rm <container>	Remove container(s)
+podman ps	Show running containers
+podman ps -a	Show all containers (running + exited)
+podman logs <container>	Show logs from a container
+podman exec -it <ctr> <cmd>	Execute a command inside a running container (e.g. bash, sh)
+podman attach <container>	Attach to a running container’s STDIN/STDOUT
+podman inspect <container>	Show configuration and status of a container
+
+Rootless + User Commands
+Command	Description
+podman unshare	Run a command in the user namespace of the container engine
+podman rootless	Check or troubleshoot rootless container support
+podman system migrate	Migrate storage and container settings (useful after upgrades)
+
+Volume & Storage
+Command	Description
+podman volume create	Create a named volume
+podman volume ls	List volumes
+podman volume inspect <name>	Show volume details
+podman volume rm <name>	Remove a volume
+
+Pod Management (like Kubernetes Pods)
+Command	Description
+podman pod create	Create a new pod (group of containers sharing network/IPC)
+podman pod ls	List running pods
+podman pod inspect <pod>	Show pod details
+podman pod rm <pod>	Remove a pod (must stop containers first)
+podman run --pod <pod>	Run a container inside a pod
+
+System Management
+Command	Description
+podman system df	Show disk usage of images/containers/volumes
+podman system reset	Remove all containers, pods, images, and volumes
+podman system prune	Remove unused data (like docker system prune)
+
+Compose & Auto-Start
+Command	Description
+podman-compose up	Start containers defined in a Compose file (requires pip install podman-compose)
+podman generate systemd <ctr/pod>	Generate systemd service file to auto-start container/pod
+
+Registry / Authentication
+Command	Description
+podman login <registry>	Log in to a remote container registry
+podman logout <registry>	Log out of the container registry
+podman search <image>	Search for images on a registry
+
+Example Quickstart Commands
+# Pull an image
+podman pull nginx
+
+# Run container
+podman run -d -p 8080:80 --name web nginx
+
+# View logs
+podman logs web
+
+# Stop & remove
+podman stop web && podman rm web
+
