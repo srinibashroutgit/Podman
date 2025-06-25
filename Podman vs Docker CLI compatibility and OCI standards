@@ -1,0 +1,94 @@
+Podman vs Docker	CLI compatibility and OCI standards:
+
+how Podman vs Docker compares in terms of CLI compatibility and OCI standards, including commands, usage, and under-the-hood differences.
+
+Quick Overview
+Feature		Docker					Podman
+CLI compatible	✅ Native				✅ Docker-compatible
+OCI compliant	✅ Yes					✅ Yes
+Requires daemon	✅ Yes (dockerd)			❌ No daemon (daemonless)
+Supports rootless mode	⚠️ Limited/optional		✅ Full built-in
+Pod concept (like K8s)	❌ No				✅ Yes
+
+Part 1: CLI Compatibility (Step-by-step)
+Step 1: Install Podman
+sudo apt update
+sudo apt install podman -y
+
+Check version:
+podman --version
+
+Step 2: Alias Podman as Docker
+To make all Docker commands work via Podman:
+
+alias docker=podman
+
+Or persist it:
+echo "alias docker=podman" >> ~/.bashrc
+source ~/.bashrc
+
+Now try common commands:
+
+Command	Works with Podman?	Notes
+docker pull nginx		✅ Yes	Pulls from Docker Hub (or other registries)
+docker run -it ubuntu bash	✅ Yes	Interactive shell
+docker ps			✅ Yes	Shows running containers
+docker images			✅ Yes	Lists local images
+docker stop <container>		✅ Yes	Stops containers
+
+Full CLI Compatibility. Almost all docker CLI commands work exactly the same with Podman.
+
+Step 3: Run a Web Server
+podman run -d -p 8080:80 nginx
+curl http://localhost:8080
+
+CLI Differences (Rare but Real)
+Docker Command	Podman Equivalent	Why it's different
+docker system prune	podman system prune	✅ Same
+docker-compose up	podman-compose up or podman play kube	⚠️ Docker Compose not built-in
+docker logs <container>	podman logs <container>	✅ Same
+
+Note: Use podman-compose (Python package) if you're migrating Docker Compose workflows.
+
+Part 2: OCI Standards (Open Container Initiative)
+OCI = A standard format for container images and runtimes.
+
+Step 1: Understand OCI Components
+Component	Role	Used by Podman?	Used by Docker?
+OCI Image Spec	Defines how images are structured	✅ Yes	✅ Yes
+OCI Runtime Spec	Defines how containers are launched from image	✅ Yes (runc, crun)	✅ Yes (runc)
+OCI Distribution	Standardizes registry communications	✅ Yes	✅ Yes
+
+Step 2: Podman Image Format Compatibility
+Images built with Podman are:
+
+OCI-compliant
+Can be pushed to Docker Hub, GitHub Container Registry, Harbor, etc.
+Can be run by Docker, Kubernetes, containerd, etc.
+
+Example:
+podman build -t myapp:latest .
+podman tag myapp:latest docker.io/myuser/myapp:latest
+podman push docker.io/myuser/myapp:latest
+This image is 100% OCI-compliant and can be pulled by Docker or K8s.
+
+Step 3: Runtime Compatibility
+Podman uses OCI runtimes:
+podman info | grep -i "oci"
+You’ll see:
+ociRuntime.name: runc
+
+Same runc used by Docker, containerd, Kubernetes, etc.
+
+You can even switch to crun (lighter, faster) if supported.
+
+⚖️ Summary Table: CLI & OCI Comparison
+Feature			Docker		Podman
+CLI compatible		✅ Native	✅ Aliased
+Requires daemon		✅ Yes		❌ No
+Run as non-root user	⚠️ Workaround	✅ Native
+Pod support		❌ No		✅ Yes
+OCI image standard	✅ Yes		✅ Yes
+OCI runtime (runc)	✅ Yes		✅ Yes
+Compose support		✅ Native	⚠️ podman-compose (external)
+Systemd support		⚠️ Manual	✅ Built-in

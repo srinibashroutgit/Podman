@@ -1,0 +1,136 @@
+Install Podman on popular Linux distributions (RHEL, CentOS, Fedora, and Ubuntu):
+
+Part 1: Set the Hostname (on Any Linux)
+
+Set a hostname:
+sudo hostnamectl set-hostname podman-node
+sudo vi /etc/hosts
+127.0.0.1   podman-node
+
+Check it:
+hostname
+
+Part 2: Install Podman on Various Distros
+1. Ubuntu 22.04 / 20.04
+sudo apt update
+sudo apt -y install podman
+
+Test it:
+podman --version
+podman info
+
+2. RHEL 8 / 9 (Red Hat Enterprise Linux)
+Podman is officially supported and maintained by Red Hat.
+sudo dnf -y update
+sudo dnf -y install podman
+
+Optional: Enable rootless support (already included in modern RHEL versions):
+sudo systemctl enable --now podman.socket
+
+3. CentOS Stream 8 / 9
+sudo dnf -y update
+sudo dnf -y install podman
+
+Check it:
+podman --version
+
+4. Fedora (36, 37, 38, etc.)
+Podman is included by default in Fedora.
+sudo dnf -y update
+sudo dnf -y install podman
+
+Bonus: Enable Auto-Completion for Bash/Zsh
+# For Bash
+sudo apt install bash-completion -y  # Ubuntu
+source /usr/share/bash-completion/completions/podman
+
+# For Zsh
+echo "autoload -U compinit; compinit" >> ~/.zshrc
+
+Optional: Configure Registries (To avoid image pull errors)
+sudo vi /etc/containers/registries.conf
+Add:
+[registries.search]
+registries = ['docker.io']
+
+Verify Installation (All Distros)
+podman info
+podman run --rm -it alpine sh
+
+------
+
+Step-by-Step Setup: Podman + Podman-Compose
+
+1. Install Podman
+On Ubuntu:
+sudo apt update
+sudo apt install podman -y
+
+On RHEL/CentOS/Fedora:
+sudo dnf install podman -y
+
+Check version:
+podman --version
+
+2. Install Python & pip
+You need Python ≥ 3.6:
+
+sudo apt install python3-pip -y   # Ubuntu
+# OR
+sudo dnf install python3-pip -y   # RHEL/Fedora
+
+Check Python version:
+python3 --version
+
+3. Install podman-compose
+pip3 install --user podman-compose
+
+Make sure your $PATH includes the user bin directory:
+echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+Verify:
+podman-compose --version
+
+Step-by-Step Test: Run a Simple App
+Create a directory:
+mkdir ~/podman-test && cd ~/podman-test
+
+Create a docker-compose.yml:
+version: "3.8"
+
+services:
+  web:
+    image: nginx
+    ports:
+      - "8080:80"
+      
+Save it as docker-compose.yml
+
+Run:
+podman-compose up
+
+http://localhost:8080
+
+Common Commands
+Task	Command
+Start containers	podman-compose up
+Stop containers	podman-compose down
+See logs	podman-compose logs
+Rebuild containers	podman-compose build
+List containers/images	podman ps / podman images
+
+Notes on Rootless Mode
+By default, Podman runs containers as your non-root user — safer than Docker.
+
+Ports < 1024 (like 80, 443) may require root privileges or use ports like 8080/8443.
+
+Troubleshooting Tips
+short-name "nginx" did not resolve...
+Add Docker Hub as a registry:
+[registries.search]
+registries = ['docker.io']
+in /etc/containers/registries.conf
+
+If you get networking issues, try:
+podman network ls

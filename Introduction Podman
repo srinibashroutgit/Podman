@@ -1,0 +1,87 @@
+What is Podman?
+Podman is a daemonless container engine that allows you to run containers without a separate daemon process. It's a popular alternative to Docker.
+
+Overview
+- Daemonless: Podman doesn't require a separate daemon process to run containers.
+- Docker-compatible: Podman is compatible with Docker images and containers.
+- Secure: Podman uses a more secure architecture than Docker.
+
+Podman Overview (Simple Lines)
+Open-source tool to run containers and pods
+
+Supports OCI (Open Container Initiative) standards
+
+Works without a central daemon
+
+Can run containers as non-root users (secure!)
+
+CLI is Docker-compatible (you can alias docker to podman)
+
+Supports pods, just like Kubernetes!
+
+
+Podman Architecture
+Component			Description
+CLI			User interacts using podman commands
+No Daemon		Each command runs as a short-lived process
+Containers		Runs in isolated processes via runc or crun
+Storage			Uses local filesystem or overlayfs for images
+Network			Uses CNI (Container Network Interface) plugins
+Pods (optional)		Groups of containers sharing network namespace
+
+Podman can even generate systemd services for container auto-start!
+
+Podman vs Docker
+Feature			Docker			Podman
+Daemon-based		✅ Yes (dockerd)	❌ No daemon
+Rootless containers	⚠️ Optional, complex	✅ Built-in
+Docker-compatible CLI	✅ Yes			✅ Yes (drop-in replacement)
+Pod support		❌ No			✅ Yes (like Kubernetes)
+Systemd integration	⚠️ Manual		✅ Built-in
+OCI-compliance		✅ Yes				✅ Yes
+Remote management	✅ Docker Desktop/API	✅ Via podman-remote
+
+
+Architecture
+- Client-server model: Podman uses a client-server model, but the server is built into the Podman binary.
+- Container runtime: Podman uses a container runtime (e.g., runc) to run containers.
+- Image management: Podman manages images using a local cache.
+
+Comparison with Docker
+- Daemon: Docker requires a separate daemon process, while Podman doesn't.
+- Security: Podman's daemonless architecture is more secure than Docker's.
+- Performance: Podman is often faster than Docker due to its lightweight architecture.
+- Compatibility: Podman is compatible with Docker images and containers.
+
+Key differences
+- Docker:
+    - Requires a separate daemon process.
+    - Can be slower due to the daemon overhead.
+- Podman:
+    - Daemonless architecture.
+    - Faster and more secure.
+
+When to use Podman
+- Security-critical environments: Podman's daemonless architecture makes it a good choice for security-critical environments.
+- Resource-constrained environments: Podman's lightweight architecture makes it suitable for resource-constrained environments.
+
+When to use Docker
+- Existing Docker infrastructure: If you're already invested in Docker, it might be easier to stick with it.
+- Large-scale deployments: Docker's ecosystem and community support make it a popular choice for large-scale deployments.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

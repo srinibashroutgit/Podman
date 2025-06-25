@@ -1,0 +1,105 @@
+Rootless Containers	How Podman runs containers without root privileges:
+
+Running rootless containers with Podman means you can build and run containers without requiring sudo or root privileges, making it safer for multi-user systems and secure environments.
+
+Here’s a step-by-step guide to understand and set up rootless containers with Podman in Ubuntu 22.04 or any modern Linux system.
+
+Why Rootless Containers?
+No root → Less risk of privilege escalation
+Ideal for shared environments (multi-user systems)
+Safer alternative to Docker (which runs a root daemon)
+
+Step-by-Step: Run Rootless Containers with Podman
+Step 1: Install Podman (User or Root)
+On Ubuntu 22.04:
+sudo apt update
+sudo apt install podman -y
+
+Check version:
+podman --version
+
+Step 2: Enable Subuid and Subgid (for User Namespace)
+Podman needs UID/GID mappings to isolate container users.
+
+Check your username:
+whoami
+
+Then edit:
+sudo vi /etc/subuid
+sudo vi /etc/subgid
+
+Add lines like:
+yourusername:100000:65536
+
+This means: your user gets 65k UIDs/GIDs starting from 100000.
+
+Step 3: Enable User Namespace Support (usually auto-enabled)
+Check:
+cat /proc/sys/user/max_user_namespaces
+
+If it’s 0, enable it:
+echo 28633 | sudo tee /proc/sys/user/max_user_namespaces
+
+Or permanently add it to:
+sudo vi /etc/sysctl.conf
+# Add:
+user.max_user_namespaces=28633
+
+Apply:
+sudo sysctl -p
+
+Step 4: Test Rootless Podman
+Now switch to your normal user and run:
+podman info --debug | grep rootless
+
+You should see: rootless: true
+
+Run a container without sudo:
+podman run --rm -it alpine sh
+
+Inside the container:
+whoami  # -> root (inside container)
+exit
+
+Outside the container:
+id  # -> your non-root user
+
+You just ran a root container as a non-root user!
+
+Step 5: Run a Rootless Web App
+podman run -d -p 8080:80 nginx
+curl localhost:8080
+
+If you get a permission error on binding low ports (<1024), use a port above 1024 like 8080.
+
+Step 6: Auto-Start with Systemd (Rootless)
+podman generate systemd --name mycontainer --files --restart-policy=always
+systemctl --user daemon-reexec
+systemctl --user daemon-reload
+systemctl --user enable container-mycontainer
+systemctl --user start container-mycontainer
+
+Podman integrates per-user systemd without root!
+
+📦 Where are Files Stored?
+File Type	Location
+Images	~/.local/share/containers/
+Containers	~/.local/share/containers/storage/
+Logs	~/.local/share/containers/storage/overlay-containers/.../userdata/ctr.log
+
+Docker	 vs 	Podman Rootless
+Feature			Docker Rootless		Podman Rootless
+Default rootless	❌ No (manual setup)	✅ Yes (out-of-the-box)
+Needs daemon?		✅ Yes			❌ No daemon
+User namespaces		⚠️ Optional		✅ Always used
+Systemd integration	❌ Complex		✅ Built-in
+
+Security Highlights
+Isolated UID/GID map
+
+No root daemon running in background
+
+Secure by design for multi-user systems
+
+Less attack surface than Docker
+
